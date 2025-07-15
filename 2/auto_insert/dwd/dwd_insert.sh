@@ -13,26 +13,19 @@ fi
 
 sqlStr="
 --分区
-SET hive.exec.dynamic.partition = true;
-
-SET hive.exec.dynamic.partition.mode = nonstrict;
-
-set hive.exec.max.dynamic.partitions.pernode = 10000;
-
-set hive.exec.max.dynamic.partitions = 100000;
-
-set hive.exec.max.created.files = 150000;
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.max.dynamic.partitions.pernode=10000;
+set hive.exec.max.dynamic.partitions=100000;
+set hive.exec.max.created.files=150000;
 --hive压缩
-set hive.exec.compress.intermediate = true;
-
-set hive.exec.compress.output = true;
+set hive.exec.compress.intermediate=true;
+set hive.exec.compress.output=true;
 --写入时压缩生效
-set hive.exec.orc.compression.strategy = COMPRESSION;
+set hive.exec.orc.compression.strategy=COMPRESSION;
 --分桶
-set hive.enforce.bucketing = true;
--- 开启分桶支持, 默认就是true
-set hive.enforce.sorting = true;
--- 开启强制排序
+set hive.enforce.bucketing=true; -- 开启分桶支持, 默认就是true
+set hive.enforce.sorting=true; -- 开启强制排序
 insert OVERWRITE 
 table dwd.itcast_intention_dwd partition (yearinfo, monthinfo, dayinfo)
 select
