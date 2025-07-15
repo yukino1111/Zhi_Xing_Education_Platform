@@ -12,7 +12,12 @@ set hive.exec.orc.compression.strategy=COMPRESSION;
 --分桶
 set hive.enforce.bucketing=true; -- 开启分桶支持, 默认就是true
 set hive.enforce.sorting=true; -- 开启强制排序
-
+SET hive.optimize.skewjoin = true;
+SET hive.skewjoin.mapjoin.map.tasks = 10000; -- 倾斜数据MapJoin的Map任务数
+SET hive.skewjoin.mapjoin.min.split = 33554432; 
+SET mapreduce.reduce.memory.mb = 5632; -- 保持在集群最大允许内存
+SET mapreduce.reduce.java.opts = -Xmx4224m; -- 对应堆内存
+SET mapreduce.reduce.cpu.vcores = 4; -- 将vCores设置为集群允许的最大值
 -- 开启强制排序
 insert into
 table dwd.itcast_intention_dwd partition (yearinfo, monthinfo, dayinfo)
