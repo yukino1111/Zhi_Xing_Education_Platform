@@ -1,4 +1,3 @@
-set hive.exec.orc.compression.strategy = COMPRESSION;
 CREATE DATABASE IF NOT EXISTS ods;
 -- 客户意向表(内部 分区 分桶表, 拉链表)
 CREATE TABLE IF NOT EXISTS ods.`customer_relationship` (
