@@ -1,45 +1,73 @@
+drop database app_didi cascade;
+CREATE DATABASE IF NOT EXISTS app_didi;
+
 -- 总订单笔数
 create table if not exists app_didi.t_order_total(
-    date_val string comment '日期（年月日)',
-    count int comment '订单笔数'
-)
-partitioned by (month string comment '年月，yyyy-MM')
-row format delimited fields terminated by ',';
+    count int comment '订单笔数',
+    time_type string comment '时间维度: 年 1, 月 2, 日 3'
+)comment '订单笔数表' partitioned by(
+    yearinfo string,
+    monthinfo string,
+    dayinfo string
+)row format delimited fields terminated by ',';
 
 -- 预约和非预约用户占比
 -- 需求:
 -- 求出预约用户订单所占的百分比:
 create table if not exists app_didi.t_order_subscribe_percent(
-    date_val string comment '日期',
-    subscribe_name string comment '是否预约',
-    percent_val string comment '百分比'
-)partitioned by (month string comment '年月yyyy-MM') 
-row format delimited fields terminated by ',';
+    time_type string comment '时间维度: 年 1, 月 2, 日 3',
+    subscribe_percent string comment '预约百分比',
+    non_subscribe_percent string comment '非预约百分比'
+)partitioned by (
+    yearinfo string,
+    monthinfo string,
+    dayinfo string
+)row format delimited fields terminated by ',';
 
 --不同时段的占比分析
 create table if not exists app_didi.t_order_timerange_total(
-    date_val string comment '日期',
     timerange string comment '时间段',
+    time_type string comment '时间维度: 年 1, 月 2, 日 3',
     count int comment '订单数量'
 )
-partitioned by (month string comment '年月，yyyy-MM')
-row format delimited fields terminated by ',';
+partitioned by (
+    yearinfo string,
+    monthinfo string,
+    dayinfo string
+)row format delimited fields terminated by ',';
 
 -- 不同地域订单占比
 create table if not exists app_didi.t_order_province_total(
-    date_val string comment '日期',
     province string comment '省份',
+    time_type string comment '时间维度: 年 1, 月 2, 日 3',
     count int comment '订单数量'
 )
-partitioned by (month string comment '年月，yyyy-MM')
-row format delimited fields terminated by ',';
+partitioned by (
+    yearinfo string,
+    monthinfo string,
+    dayinfo string
+)row format delimited fields terminated by ',';
 
--- 不同年龄段，不同时段订单占比
-create table if not exists app_didi.t_order_age_and_time_range_total(
-    date_val string comment '日期',
+-- 不同年龄段订单占比
+create table if not exists app_didi.t_order_age_range_total(
     age_range string comment '年龄段',
-    order_time_range string comment '时段',
+    time_type string comment '时间维度: 年 1, 月 2, 日 3',
     count int comment '订单数量'
 )
-partitioned by (month string comment '年月，yyyy-MM')
-row format delimited fields terminated by ',';
+partitioned by (
+    yearinfo string,
+    monthinfo string,
+    dayinfo string
+)row format delimited fields terminated by ',';
+
+-- 某年/月/日 评分统计
+create table if not exists app_didi.t_order_eva_level(
+    count int comment '订单数量',
+    time_type string comment '时间维度: 年 1, 月 2, 日 3',
+    eva_level int comment '评分(1 - 5)'
+)
+partitioned by(
+    yearinfo string,
+    monthinfo string,
+    dayinfo string
+)row format delimited fields terminated by ',';

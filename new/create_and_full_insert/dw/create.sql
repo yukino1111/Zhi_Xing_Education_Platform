@@ -1,4 +1,6 @@
-create table if not exists dw_didi.t_user_order_wide(
+CREATE DATABASE IF NOT EXISTS dw_didi;
+
+create table if not exists dw_didi.t_user_order_wide (
     orderId string comment '订单id',
     telephone string comment '打车用户手机',
     lng string comment '用户发起打车的经度',
@@ -22,7 +24,6 @@ create table if not exists dw_didi.t_user_order_wide(
     order_day string comment '日',
     order_hour string comment '小时',
     order_time_range string comment '时间段',
-    order_time string comment '预约时间'
-)
-partitioned by (dt string comment '时间分区') 
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' ; 
+    order_time string comment '预约时间',
+    eva_level int comment '评价等级 (1 - 5)'
+) partitioned by (dt string comment '时间分区') ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';

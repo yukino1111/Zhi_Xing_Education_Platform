@@ -1,6 +1,8 @@
+DROP DATABASE second;
+
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS second;
-
+CREATE DATABASE IF NOT EXISTS `second` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- 切换到 second 数据库
 USE second;
 

@@ -1,39 +1,78 @@
+#!/bin/bash
+HIVE_HOME=/usr/bin/hive
+
+if [ $# == 1 ]
+
+then
+   dateStr=$1
+
+   else 
+      dateStr=`date -d '-1 day' +'%Y-%m-%d'`
+
+fi
+
+yearStr=`date -d ${dateStr} +'%Y'`
+
+monthStr=`date -d ${dateStr} +'%m'`
+
+
+dayStr=`date -d ${dateStr} +'%d'`
+
+sqlStr="
+SET mapreduce.reduce.memory.mb = 3072; -- 3GB
+SET mapreduce.reduce.java.opts = -Xmx2457m; -- 3072MB * 0.8 = 2457.6MB，取整 2457m
 --分区
-SET hive.exec.dynamic.partition = true;
-
-SET hive.exec.dynamic.partition.mode = nonstrict;
-
-set hive.exec.max.dynamic.partitions.pernode = 10000;
-
-set hive.exec.max.dynamic.partitions = 100000;
-
-set hive.exec.max.created.files = 150000;
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.max.dynamic.partitions.pernode=10000;
+set hive.exec.max.dynamic.partitions=100000;
+set hive.exec.max.created.files=150000;
 --hive压缩
-set hive.exec.compress.intermediate = true;
-
-set hive.exec.compress.output = true;
+set hive.exec.compress.intermediate=true;
+set hive.exec.compress.output=true;
 --写入时压缩生效
-set hive.exec.orc.compression.strategy = COMPRESSION;
+set hive.exec.orc.compression.strategy=COMPRESSION;
 --分桶
-set hive.enforce.bucketing = true;
--- 开启分桶支持, 默认就是true
-set hive.enforce.sorting = true;
--- 开启强制排序
+set hive.enforce.bucketing=true; -- 开启分桶支持, 默认就是true
+set hive.enforce.sorting=true; -- 开启强制排序
 
--- 优化:
-set hive.auto.convert.join = false;
--- map join
-set hive.optimize.bucketmapjoin = false;
--- 开启 bucket map join
+-- 优化: 
+set hive.auto.convert.join=false;  -- map join
+set hive.optimize.bucketmapjoin = false; -- 开启 bucket map join
 -- 开启SMB map join
-set hive.auto.convert.sortmerge.join = false;
-
-set hive.auto.convert.sortmerge.join.noconditionaltask = false;
+set hive.auto.convert.sortmerge.join=false;
+set hive.auto.convert.sortmerge.join.noconditionaltask=false;
 -- 写入数据强制排序
-set hive.enforce.sorting = false;
+set hive.enforce.sorting=false;
 -- 开启自动尝试SMB连接
-set hive.optimize.bucketmapjoin.sortedmerge = false;
---年 总
+set hive.optimize.bucketmapjoin.sortedmerge = false; 
+
+
+
+alter table app_didi.t_order_total drop partition(yearinfo='${yearStr}',monthinfo='-1',dayinfo='-1');
+alter table app_didi.t_order_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='-1');
+alter table app_didi.t_order_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='${dayStr}');
+
+alter table app_didi.t_order_subscribe_percent drop partition(yearinfo='${yearStr}',monthinfo='-1',dayinfo='-1');
+alter table app_didi.t_order_subscribe_percent drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='-1');
+alter table app_didi.t_order_subscribe_percent drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='${dayStr}');
+
+alter table app_didi.t_order_timerange_total drop partition(yearinfo='${yearStr}',monthinfo='-1',dayinfo='-1');
+alter table app_didi.t_order_timerange_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='-1');
+alter table app_didi.t_order_timerange_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='${dayStr}');
+
+alter table app_didi.t_order_province_total drop partition(yearinfo='${yearStr}',monthinfo='-1',dayinfo='-1');
+alter table app_didi.t_order_province_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='-1');
+alter table app_didi.t_order_province_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='${dayStr}');
+
+alter table app_didi.t_order_age_range_total drop partition(yearinfo='${yearStr}',monthinfo='-1',dayinfo='-1');
+alter table app_didi.t_order_age_range_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='-1');
+alter table app_didi.t_order_age_range_total drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='${dayStr}');
+
+alter table app_didi.t_order_eva_level drop partition(yearinfo='${yearStr}',monthinfo='-1',dayinfo='-1');
+alter table app_didi.t_order_eva_level drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='-1');
+alter table app_didi.t_order_eva_level drop partition(yearinfo='${yearStr}',monthinfo='${monthStr}',dayinfo='${dayStr}');
+
 insert into
 table app_didi.t_order_total partition (yearinfo, monthinfo, dayinfo)
 select
@@ -43,6 +82,8 @@ select
     '-1' as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr}
 group by
     order_year;
 
@@ -56,6 +97,9 @@ select
     order_month as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr}
 group by
     order_year,
     order_month;
@@ -70,6 +114,10 @@ select
     order_month as monthinfo,
     order_day as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr} AND
+    order_day = ${dayStr}
 group by
     order_year,
     order_month,
@@ -108,6 +156,8 @@ SELECT
     '-1' as monthinfo,
     '-1' as dayinfo
 FROM dw_didi.t_user_order_wide t1
+where
+    order_year = ${yearStr}
 group by
     order_year;
 
@@ -144,6 +194,9 @@ SELECT
     order_month as monthinfo,
     '-1' as dayinfo
 FROM dw_didi.t_user_order_wide t1
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr}
 group by
     order_year,
     order_month;
@@ -181,6 +234,10 @@ SELECT
     order_month as monthinfo,
     order_day as dayinfo
 FROM dw_didi.t_user_order_wide t1
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr} AND
+    order_day = ${dayStr}
 group by
     order_year,
     order_month,
@@ -197,6 +254,8 @@ select
     '-1' as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr}
 group by
     order_year,
     order_time_range;
@@ -212,6 +271,9 @@ select
     order_month as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr}
 group by
     order_year,
     order_month,
@@ -228,6 +290,10 @@ select
     order_month as monthinfo,
     order_day as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr} AND
+    order_day = ${dayStr}
 group by
     order_year,
     order_month,
@@ -245,6 +311,8 @@ select
     '-1' as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr}
 group by
     order_year,
     province;
@@ -260,6 +328,9 @@ select
     order_month as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr}
 group by
     order_year,
     order_month,
@@ -274,8 +345,12 @@ select
     count(*) as order_cnt,
     order_year as yearinfo,
     order_month as monthinfo,
-    order_day as dayinfo,
+    order_day as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr} AND
+    order_day = ${dayStr}
 group by
     order_year,
     order_month,
@@ -293,6 +368,8 @@ select
     '-1' as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr}
 group by
     order_year,
     age_range;
@@ -308,6 +385,9 @@ select
     order_month as monthinfo,
     '-1' as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr}
 group by
     order_year,
     order_month,
@@ -324,13 +404,17 @@ select
     order_month as monthinfo,
     order_day as dayinfo
 from dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr} AND
+    order_day = ${dayStr}
 group by
     order_year,
     order_month,
     order_day,
     age_range;
 
--- 某年/月/日 评分统计
+-- 某年/月/日 评分占比
 insert into
 table app_didi.t_order_eva_level partition (yearinfo, monthinfo, dayinfo)
 SELECT
@@ -341,6 +425,8 @@ SELECT
     '-1' as monthinfo,
     '-1' as dayinfo
 FROM dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr}
 GROUP BY
     order_year,
     eva_level;
@@ -355,6 +441,9 @@ SELECT
     order_month as monthinfo,
     '-1' as dayinfo
 FROM dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr}
 GROUP BY
     order_year,
     order_month,
@@ -370,8 +459,14 @@ SELECT
     order_month as monthinfo,
     order_day as dayinfo
 FROM dw_didi.t_user_order_wide
+where
+    order_year = ${yearStr} AND
+    order_month = ${monthStr} AND
+    order_day = ${dayStr}
 GROUP BY
     order_year,
     order_month,
     order_day,
     eva_level;
+"
+${HIVE_HOME} -e "${sqlStr}" 
