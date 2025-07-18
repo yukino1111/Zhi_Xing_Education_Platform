@@ -274,7 +274,7 @@ select
     count(*) as order_cnt,
     order_year as yearinfo,
     order_month as monthinfo,
-    order_day as dayinfo,
+    order_day as dayinfo
 from dw_didi.t_user_order_wide
 group by
     order_year,

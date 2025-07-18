@@ -16,10 +16,10 @@ CUSTOMER_TABLE = "teach.customer"  # 客户ID来源表
 CUSTOMER_RELATIONSHIP_TABLE = "customer_relationship"  # 目标数据插入表
 
 # --- 生成数据数量 ---
-NUM_RECORDS_TO_GENERATE = 30000
+NUM_RECORDS_TO_GENERATE = 100000
 
 # --- ID起始值 ---
-STARTING_ID = 100011
+STARTING_ID = 199987
 
 # --- 批量插入大小 ---
 BATCH_SIZE = 1000  # 每次插入多少条记录

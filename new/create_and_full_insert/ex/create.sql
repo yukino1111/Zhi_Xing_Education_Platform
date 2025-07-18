@@ -1,4 +1,4 @@
--- DROP DATABASE IF EXISTS second_ex;
+DROP DATABASE IF EXISTS second_ex;
 CREATE DATABASE IF NOT EXISTS second_ex;
 
 ALTER DATABASE second_ex CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

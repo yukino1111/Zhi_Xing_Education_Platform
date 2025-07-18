@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS dw_didi;
-
+drop table if exists dw_didi.t_user_order_wide;
 create table if not exists dw_didi.t_user_order_wide (
     orderId string comment '订单id',
     telephone string comment '打车用户手机',

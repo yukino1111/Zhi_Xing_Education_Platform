@@ -24,11 +24,6 @@ set hive.enforce.sorting=false;
 -- 开启自动尝试SMB连接
 set hive.optimize.bucketmapjoin.sortedmerge = false; 
 
-SET hive.skewjoin.mapjoin.map.tasks = 10000; -- 倾斜数据MapJoin的Map任务数
-SET hive.skewjoin.mapjoin.min.split = 33554432; 
-SET mapreduce.reduce.memory.mb = 5632; -- 保持在集群最大允许内存
-SET mapreduce.reduce.java.opts = -Xmx4224m; -- 对应堆内存
-SET mapreduce.reduce.cpu.vcores = 4; -- 将vCores设置为集群允许的最大值
 
 
 insert into
